@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: a3028-app-deploy   # 배포 이름
+  namespace: skala3-ai1       # 목적지 네임스페이스 
+spec:
+  replicas: 1                 # Pod 개수 1개
+  selector:
+    matchLabels:
+      app: a3028-app
+  template:
+    metadata:
+      labels:
+        app: a3028-app
+    spec:
+      imagePullSecrets:
+      - name: harbor-pull-secret
+      containers:
+      - name: ai-container
+        # Harbor 이미지 주소
+        image: amdp-registry.skala-ai.com/skala26a-ai1/a3028-my-app:latest
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8080 
