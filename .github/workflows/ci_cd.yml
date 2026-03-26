@@ -8,6 +8,9 @@ env:
   HARBOR_REGISTRY: ${{ vars.HARBOR_REGISTRY }}
   HARBOR_PROJECT: "skala26a-ai1"  # 하버에서 만든 프로젝트 이름을 적으세요 (예: skala-2025)
   IMAGE_NAME: "a3028-my-app"          # 하버에 저장될 이미지 이름
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  EKS_CLUSTER_NAME: ${{ vars.EKS_CLUSTER_NAME }}
+  K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
 
 jobs:
   build-and-push:
@@ -50,11 +53,11 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-northeast-2
+          aws-region: ${{ vars.AWS_REGION }}
 
       # 2. 쿠버네티스 접속 정보 업데이트 (localhost가 아닌 EKS 주소를 찾아가게 함)
       - name: Update Kubeconfig
-        run: aws eks update-kubeconfig --name skala-2025 --region ap-northeast-2
+        run: aws eks update-kubeconfig --name ${{ vars.EKS_CLUSTER_NAME }} --region ${{ vars.AWS_REGION }}
 
       - name: Deploy to Kubernetes
         run: |
