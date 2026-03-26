@@ -44,7 +44,20 @@ jobs:
           tags: |
             ${{ env.HARBOR_REGISTRY }}/${{ env.HARBOR_PROJECT }}/${{ env.IMAGE_NAME }}:latest
 
+      # 1. AWS 로그인 (이게 없으면 kubectl이 작동 안 합니다)
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      # 2. 쿠버네티스 접속 정보 업데이트 (localhost가 아닌 EKS 주소를 찾아가게 함)
+      - name: Update Kubeconfig
+        run: aws eks update-kubeconfig --name skala-2025 --region ap-northeast-2
+
       - name: Deploy to Kubernetes
         run: |
           kubectl apply -f deployment.yaml
           kubectl apply -f service.yaml
+          kubectl apply -f ingress.yaml
